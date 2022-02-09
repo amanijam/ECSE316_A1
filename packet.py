@@ -1,12 +1,14 @@
 # Putting together the packets, which are made up of the Header and the Question (2 classes?)
 
+import random
+
 class Packet:
     # Header, Question, Answer, Authority, Additional
     def __init__(self, header, question, answer=None, auth=None, add=None):
         self.header = header
         self.question = question
 
-
+## NOTE: So far, only for REQUESTS ##
 class Header:
     # ID      : 16-bit              ; should be random
     # QR      : 1-bit               ; query (0) or response (1)
@@ -28,10 +30,21 @@ class Header:
     # ANCOUNT : 16-bit              ; num of resource records in the answer section
     # NSCOUNT : 16-bit              ; num of name server recors in Authority section (can ignore)
     # ARCOUNT : 16-bit              ; num of records in Additional section
-    def __init__(self, qr):
-        self.qr = qr
+    def __init__(self):
+        self.id = random.getrandbits(16) # returns a non-negative integer with k random bits
+        self.qr = 0
+        self.opcode = 0
+        self.aa = 0
+        self.tc = 0
+        self.rd = 1
+        self.ra = 0
+        self.z = 0
+        self.rcode = 0
+        self.qdcount = 1
+        self.ancount = 0
+        self.nscount = 0
+        self.arcount = 0
         
-
 
 class Question:
     # QNAME  : domain name represented by sequence of labels
@@ -40,8 +53,30 @@ class Question:
                 # 0x0002 for type-NS
                 # 0x000f for type-MX
     # QCLASS : 16-bit code specifying class of query (should always be 0x0001, representing an Internet address)
-    def __init__(self, qName, qType):
-        self.qName = qName
-        self.qType = qType
+
+    # Expected inputs: name (str), ty (str), class (int) 
+    def __init__(self, name, ty, c: int):
+        self.qName = encodeName(name)
+        self.qType = encodeType(ty)
+        self.qClass = c.to_bytes(16, 'big')
+
+def encodeName(name):
+    lengths = []
+    count = 0
+    for i in range(0, len(name)):
+        if(name[i] == '.'):
+            lengths.append(count)
+            count = 0
+        else:
+            count += 1
+    lastI = 0
+    for i in range(0, len(lengths)): lastI += (lengths[i] + 1)
+    lastLength = len(name) - lastI
+    lengths.append(lastLength)
+    return lengths
+
+
+def encodeType(ty):
+    return ty
 
     

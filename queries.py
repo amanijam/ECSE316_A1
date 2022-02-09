@@ -15,27 +15,15 @@ class Query:
         
     def send(self):
         #create Header
-        header = Header(0) # QR = 0
+        header = Header() 
 
         # create Question
-        qName = encodeName(self.name)
-        qType = encodeType(self.ty)
-        question = Question(qName, qType, '0x0001')
+        question = Question(self.name, self.ty, 1)
 
         requestPack = Packet(header, question)
         addr = (self.server, self.port)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        client.connect(addr)
         client.sentto(bytes(requestPack), addr)
         data = client.recv(1024) # How is this data formatted..?
     
-
-
-### TODO ###
-def encodeName(name):
-    # return domain name represented by sequence of labels
-    return name
-
-### TODO ###
-def encodeType(type):
-    # return domain name represented by sequence of labels
-    return type
