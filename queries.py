@@ -26,7 +26,7 @@ class Query:
         addr = (self.server, self.port)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.sentto(bytes(requestPack), addr)
-        data, a = client.recvfrom(1024)
+        data = client.recv(1024) # How is this data formatted..?
     
 
 

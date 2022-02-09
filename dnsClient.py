@@ -41,12 +41,9 @@ else:
     name = sys.argv[-1]
     # print('{} {} {} {} {} {} {}'.format(timeout, maxR, port, rType, server, name))
 
-    def print_to_stdout(a):
-        print(a, file = sys.stdout)
- 
-    print("DNS Client sending request for {}".format(name), file = sys.stdout)
-    print("Server: {}".format(server), file = sys.stdout)
-    print("Request type: {}".format(rType), file = sys.stdout)
+    print("DNS Client sending request for {}".format(name))
+    print("Server: {}".format(server))
+    print("Request type: {}".format(rType))
 
     query = Query(server, name, timeout, maxR, port, rType)
     query.send()
