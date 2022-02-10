@@ -70,7 +70,8 @@ def encodeName(name):
             code += name[x]
             x += 1
         x += 1 # skip '.'
-    return code
+    #return code
+    return code.encode()
 
 def getLengthsList(name):
     lengths = []
