@@ -61,6 +61,18 @@ class Question:
         self.qClass = c.to_bytes(16, 'big')
 
 def encodeName(name):
+    lengths = getLengthsList(name)
+    code = ''
+    x = 0
+    for i in range(0, len(lengths)):
+        code += str(lengths[i])
+        for j in range (0, lengths[i]):
+            code += name[x]
+            x += 1
+        x += 1 # skip '.'
+    return code
+
+def getLengthsList(name):
     lengths = []
     count = 0
     for i in range(0, len(name)):
@@ -78,5 +90,7 @@ def encodeName(name):
 
 def encodeType(ty):
     return ty
+
+print(encodeName('www.mcgill.ca'))
 
     
