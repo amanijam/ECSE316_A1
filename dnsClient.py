@@ -35,18 +35,17 @@ else:
         else:
             print("ERROR Expected Syntax: {}".format(expSyntax))
             break
-    # if(sys.argv[-2])[0] == '@': server = sys.argv[-2][1:]
-    # else: sys.exit("ERROR Expected Syntax: {}".format(expSyntax))
-    server = sys.argv[-2]
-    name = sys.argv[-1]
-    # print('{} {} {} {} {} {} {}'.format(timeout, maxR, port, rType, server, name))
+# if(sys.argv[-2])[0] == '@': server = sys.argv[-2][1:]
+# else: sys.exit("ERROR Expected Syntax: {}".format(expSyntax))
+server = sys.argv[-2]
+name = sys.argv[-1]
 
-    print("DNS Client sending request for {}".format(name))
-    print("Server: {}".format(server))
-    print("Request type: {}".format(rType))
+print("DNS Client sending request for {}".format(name))
+print("Server: {}".format(server))
+print("Request type: {}".format(rType))
 
-    query = Query(server, name, timeout, maxR, port, rType)
-    query.send()
+query = Query(server, name, timeout, maxR, port, rType)
+print(query.send())
 
 
 

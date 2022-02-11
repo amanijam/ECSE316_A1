@@ -1,7 +1,6 @@
 # Sending requests via sockets, and parsing the response
 
 import socket
-from urllib import request 
 from packet import *
 
 class Query:
@@ -14,7 +13,7 @@ class Query:
         self.name = name
         
     def send(self):
-        #create Header
+        #create Header for request
         header = Header() 
 
         # create Question
@@ -24,6 +23,7 @@ class Query:
         addr = (self.server, self.port)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.connect(addr)
-        client.sentto(bytes(requestPack), addr)
-        data = client.recv(1024) # How is this data formatted..?
+        client.send(requestPack.pack)
+        data = client.recv(1024) ## NOTE: probably will have to loop or something to get full data
+        return data
     
