@@ -55,12 +55,12 @@ class Question:
     # QCLASS : 16-bit code specifying class of query (should always be 0x0001, representing an Internet address)
 
     # Expected inputs: name (str), ty (str), class (int) 
-    def __init__(self, name, ty, c: int):
+    def __init__(self, name: str, ty: str, c: int):
         self.qName = encodeName(name)
         self.qType = encodeType(ty)
         self.qClass = c.to_bytes(16, 'big')
 
-def encodeName(name):
+def encodeName(name: str):
     lengths = getLengthsList(name)
     code = ''
     x = 0
@@ -70,10 +70,11 @@ def encodeName(name):
             code += name[x]
             x += 1
         x += 1 # skip '.'
+    code += '0' # 0 marks end of QNAME 
     #return code
     return code.encode()
 
-def getLengthsList(name):
+def getLengthsList(name: str):
     lengths = []
     count = 0
     for i in range(0, len(name)):
@@ -88,10 +89,16 @@ def getLengthsList(name):
     lengths.append(lastLength)
     return lengths
 
+def encodeType(ty: str) -> bytes:
+    t = b'\x00\x00'
+    if(ty.upper() == 'A'): t = b'\x00\x01'
+    elif(ty.upper() == 'NS'): t = b'\x00\x02'
+    elif(ty.upper() == 'MX'): t = b'\x00\x0f'
+    return t
 
-def encodeType(ty):
-    return ty
-
-print(encodeName('www.mcgill.ca'))
-
+x = encodeName('www.mcgill.ca')
+y = encodeType('mx')
+print(x)
+print(y)
+print(b''.join([x, y]))
     
