@@ -4,11 +4,21 @@ import random
 
 class Packet:
     # Header, Question, Answer, Authority, Additional
-    def __init__(self, header, question, answer=None, auth=None, add=None):
-        self.header = header
-        self.question = question
+    def __init__(self, header=None, question=None, answer=None, auth=None, add=None):
+        self.pack = b''
+        if(header != None): 
+            self.pack = b''.join([self.pack, header.getSection()])
+            if(question != None):
+                self.pack = b''.join([self.pack, question.getSection()])
 
-## NOTE: So far, only for REQUESTS ##
+    
+    ## NOTE: Sections should be added in order! ##
+    ## ASSUMPTION: Arg 'c' has a method called getSection()
+        # which returns the entire section as a bytes object
+    def addSection(self, c):
+        self.pack = b''.join([self.pack, c.getSection()])
+        return self.pack
+
 class Header:
     # ID      : 16-bit              ; should be random
     # QR      : 1-bit               ; query (0) or response (1)
@@ -30,20 +40,19 @@ class Header:
     # ANCOUNT : 16-bit              ; num of resource records in the answer section
     # NSCOUNT : 16-bit              ; num of name server recors in Authority section (can ignore)
     # ARCOUNT : 16-bit              ; num of records in Additional section
+
+    ## NOTE (IMPORTANT): Only for REQUESTS (so far) ##
     def __init__(self):
-        self.id = random.getrandbits(16) # returns a non-negative integer with k random bits
-        self.qr = 0
-        self.opcode = 0
-        self.aa = 0
-        self.tc = 0
-        self.rd = 1
-        self.ra = 0
-        self.z = 0
-        self.rcode = 0
-        self.qdcount = 1
-        self.ancount = 0
-        self.nscount = 0
-        self.arcount = 0
+        id = random.getrandbits(16) # returns a non-negative integer with k random bits
+        self.id = id.to_bytes(2, 'big')
+        self.flags = b'\x01\x00'
+        self.qdcount = b'\x00\x01'
+        self.ancount = b'\x00\x00'
+        self.nscount = b'\x00\x00'
+        self.arcount = b'\x00\x00'
+
+    def getSection(self):
+        return b''.join([self.id, self.flags, self.qdcount, self.ancount, self.nscount, self.arcount])
         
 
 class Question:
@@ -55,10 +64,13 @@ class Question:
     # QCLASS : 16-bit code specifying class of query (should always be 0x0001, representing an Internet address)
 
     # Expected inputs: name (str), ty (str), class (int) 
-    def __init__(self, name: str, ty: str, c: int):
+    def __init__(self, name: str, ty: str, c=1):
         self.qName = encodeName(name)
         self.qType = encodeType(ty)
-        self.qClass = c.to_bytes(16, 'big')
+        self.qClass = c.to_bytes(2, 'big')
+
+    def getSection(self):
+        return b''.join([self.qName, self.qType, self.qClass])
 
 def encodeName(name: str):
     lengths = getLengthsList(name)
@@ -71,7 +83,6 @@ def encodeName(name: str):
             x += 1
         x += 1 # skip '.'
     code += '0' # 0 marks end of QNAME 
-    #return code
     return code.encode()
 
 def getLengthsList(name: str):
@@ -96,9 +107,20 @@ def encodeType(ty: str) -> bytes:
     elif(ty.upper() == 'MX'): t = b'\x00\x0f'
     return t
 
-x = encodeName('www.mcgill.ca')
-y = encodeType('mx')
-print(x)
-print(y)
-print(b''.join([x, y]))
+# x = encodeName('www.mcgill.ca')
+# y = encodeType('mx')
+# print(x)
+# print(y)
+# print(b''.join([x, y]))
+# q = Question('www.google.com', 'NS', 1)
+# print(q.getSection())
+# p1 = Packet()
+# h = Header()
+# q = Question('www.mcgill.ca', 'A', 1)
+# p1.addSection(h)
+# p1.addSection(q)
+# print(p1.pack)
+# p2 = Packet(h, q)
+# print(p2.pack)
+
     
