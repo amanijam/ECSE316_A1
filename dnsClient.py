@@ -1,5 +1,6 @@
 import sys
 from queries import *
+from packet_decoding import *
 
 # Default values
 timeout, maxR, port, rType = 5, 3, 53, 'A'
@@ -45,7 +46,10 @@ print("Server: {}".format(server))
 print("Request type: {}".format(rType))
 
 query = Query(server, name, timeout, maxR, port, rType)
-print(query.send())
+data = query.send()
+print(data)
+decoder = Packet_Decoder(data, query.header.id)
+decoder.decode_packet()
 
 
 

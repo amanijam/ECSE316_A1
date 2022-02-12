@@ -14,12 +14,12 @@ class Query:
         
     def send(self):
         #create Header for request
-        header = Header() 
+        self.header = Header() 
 
         # create Question
         question = Question(self.name, self.ty, 1)
 
-        requestPack = Packet(header, question)
+        requestPack = Packet(self.header, question)
         addr = (self.server, self.port)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.connect(addr)
