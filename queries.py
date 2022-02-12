@@ -24,6 +24,7 @@ class Query:
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.connect(addr)
         client.send(requestPack.pack)
+        print("Request pack: {}".format(requestPack.pack))
         data = client.recv(1024) ## NOTE: probably will have to loop or something to get full data
         return data
     
