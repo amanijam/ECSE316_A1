@@ -1,6 +1,7 @@
 # Sending requests via sockets, and parsing the response
 
 import socket
+import timeit
 from packet import *
 
 class Query:
@@ -23,8 +24,12 @@ class Query:
         addr = (self.server, self.port)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.connect(addr)
+        client.settimeout(self.timeout)
         client.send(requestPack.pack)
-        print("Request pack: {}".format(requestPack.pack))
-        data = client.recv(1024) ## NOTE: probably will have to loop or something to get full data
+        #print("Request pack: {}".format(requestPack.pack))
+        try:
+            data = client.recv(1024)
+        except socket.timeout:
+            return 6
         return data
     
