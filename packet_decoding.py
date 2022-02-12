@@ -7,18 +7,30 @@ class Packet_Decoder:
         self.expected_id = struct.unpack(">H", id)[0]
 
     def decode_header(self):
-        id, flags, qdcount, ancount, nscount, arcount = struct.unpack(">HHHHHH", self.data)
+        id, flags1, flags2, ancount, nscount, arcount = struct.unpack(">HBBHHHH", self.data)
         # if self.expected_id != id:
         #     exit(99)
-        if flags < 2048 or self.expected_id != id:
+        if flags1 < 2048 or self.expected_id != id:
             exit(99)
+        
+        if flags2 != 0: 
+            exit(99)
+        # Check the RCODE
+        # Check the QDCount
+        # Check the ANCount
+        #
         
         return True
 
 
     def decode_question(self):
-        for part in self.data:
-            print(part)
+        question_data = self.data[96:]
+        num_letters = question_data[0]
+        address = ""
+        for i in range(num_letters):
+            address += chr(question_data[i+1])
+
+        print(address)
 
     def decode_packet(self):
         self.decode_header()
