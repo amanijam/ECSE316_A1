@@ -74,20 +74,18 @@ class Question:
 
 def encodeName(name: str):
     lengths = getLengthsList(name)
-    code = ''
-    x = 0
+    code = b'' #actual encoding (bytes)
+    x = 0 #iterate through 'name'
     for i in range(0, len(lengths)):
-        #code.append(lengths[i].to_bytes(2, 'big'))
-        code += str(lengths[i])
+        code += lengths[i].to_bytes(1, 'big')
+        codeStr = ''
         for j in range (0, lengths[i]):
-            code += name[x]
+            codeStr += name[x]
             x += 1
         x += 1 # skip '.'
-    code += '0' # 0 marks end of QNAME 
-    #return code.encode('ascii')
-    #z = [elem.encode('ascii') for elem in code]
-    #return b''.join(z)
-    return b'\x03\x77\x77\x77\x06\x6d\x63\x67\x69\x6c\x6c\x02\x63\x61\x00'
+        code += codeStr.encode()
+    code += b'\x00' # 0 marks end of QNAME 
+    return code
 
 def getLengthsList(name: str):
     lengths = []
