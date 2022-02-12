@@ -28,14 +28,3 @@ class Query:
         client.sentto(bytes(requestPack), addr)
         data = client.recv(1024) # How is this data formatted..?
     
-
-
-### TODO ###
-def encodeName(name):
-    # return domain name represented by sequence of labels
-    return name
-
-### TODO ###
-def encodeType(type):
-    # return domain name represented by sequence of labels
-    return type
