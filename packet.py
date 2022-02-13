@@ -72,6 +72,7 @@ class Question:
     def getSection(self):
         return b''.join([self.qName, self.qType, self.qClass])
 
+
 def encodeName(name: str):
     lengths = getLengthsList(name)
     code = b'' #actual encoding (bytes)

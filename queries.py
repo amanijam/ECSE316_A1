@@ -3,6 +3,7 @@
 import socket
 import timeit
 from packet import *
+import timeit
 
 class Query:
     def __init__(self, server, name, timeout=5, maxR=3, port=53, ty='A'):
