@@ -9,28 +9,40 @@ class Packet_Decoder:
 
     def decode_header(self):
         id, flags, qdcount, ancount, nscount, arcount = struct.unpack(">HHHHHH", self.data[:12])
-        print(bin(flags))
-        # if self.expected_id != id:
-        #     exit(99)
-        if flags < 2048 or self.expected_id != id:
-            return 1 #change this
+        bin_flags = bin(flags)
+        qr = bin_flags[0]
+        aa = bin_flags[5]
+        tc = bin_flags[6]
+        ra = bin_flags[8]
+        rcode = int(bin_flags[12:16])
+
+        if rcode == 1:
+            return 1
+        elif rcode == 2:
+            return 2
+        elif rcode == 3:
+            return 3
+        elif rcode == 4:
+            return 4
+        elif rcode == 5:
+            return 5
+
+        if self.expected_id != id:
+            return 8
         
-        if ancount == 0:
-            return 1 #change this
+        if ancount == 0 and arcount == 0:
+            return 7 
         
-        # if flags2 != 0: 
-        #     exit(99)
-        # Check the RCODE
-        # Check the QDCount
-        # Check the ANCount
-        #
+        if qr != 1:
+            return 9
+
         self.packet_size += 12
         
-        return True
+        return 0
 
 
     def decode_question(self):
-        question_data = self.data[12:]
+        question_data = self.data[self.packet_size:]
         num_vals = question_data[0]
         address = ""
         index = 0
