@@ -1,9 +1,9 @@
 # Sending requests via sockets, and parsing the response
 
 import socket
-import timeit
 from packet import *
-import timeit
+
+from packet_decoding import Packet_Decoder
 
 class Query:
     def __init__(self, server, name, timeout=5, maxR=3, port=53, ty='A'):
@@ -32,5 +32,8 @@ class Query:
             data = client.recv(1024)
         except socket.timeout:
             return 6
+        
+        decoder = Packet_Decoder(data, self.header.id)
+        decoder.decode_packet()
         return data
     

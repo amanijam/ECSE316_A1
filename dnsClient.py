@@ -1,6 +1,6 @@
 from imaplib import Time2Internaldate
 import sys
-import time
+import timeit
 from urllib import response
 from queries import *
 from packet_decoding import *
@@ -17,7 +17,9 @@ from packet_decoding import *
 # 7 : No response (nothing in Answer or Additional section)
 # 8 : (unexpected response) Response ID does not match Request ID
 # 9 : (unexpected response) Code indicates a request (0) 
-
+# 10: (unexpected response) Incorrect answer class
+# 11: Max retries exceeded
+ 
 # Default values
 timeout, maxR, port, rType = 5, 3, 53, 'A'
 server, name = None, None
@@ -45,8 +47,8 @@ else:
             rType = 'MX'
             i += 1
             continue
-        elif(sys.argv[i] == '-nx'):
-            rType = 'NX'
+        elif(sys.argv[i] == '-ns'):
+            rType = 'NS'
             i += 1
             continue
         else:
@@ -62,9 +64,10 @@ print("Server: {}".format(server))
 print("Request type: {}".format(rType))
 
 query = Query(server, name, timeout, maxR, port, rType)
+startTime = timeit.timeit()
 response = query.send()
-tries = 1
-while(tries < maxR):
+retries = 0
+while(retries < maxR):
     if(response == 1 or
        response == 2 or
        response == 3 or
@@ -74,26 +77,33 @@ while(tries < maxR):
         break
     elif(response == 6): # resend
         response = query.send()
-        tries += 1
+        retries += 1
     else:
         print(response)
         break #SUCCESS
 
+if retries == maxR:
+    response = 11
+endTime = timeit.timeit()
+responseTime = endTime - startTime
+print("\nResponse received after " + str(responseTime) + " seconds (" + str(retries) + " retries)")
 ## TODO: Add descriptions to these errors ##
 if(response == 1):
-    print("ERROR\t")
+    print("\nERROR\t")
 elif(response == 2): 
-    print("ERROR\t")
+    print("\nERROR\t")
 elif(response == 3):
-    print("ERROR\t")
+    print("\nERROR\t")
 elif(response == 4): 
-    print("ERROR\t")
+    print("\nERROR\t")
 elif(response == 5): 
-    print("ERROR\t")
+    print("\nERROR\t")
 elif(response == 6): 
-    print("ERROR\t")
+    print("\nERROR\t")
 elif(response == 7): 
-    print("NOTFOUND")
+    print("\nNOTFOUND")
+elif(response == 11): 
+    print("\nERROR\t")
 # decoder = Packet_Decoder(data, query.header.id)
 # decoder.decode_packet()
 
