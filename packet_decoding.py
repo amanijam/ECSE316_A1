@@ -35,7 +35,7 @@ class Packet_Decoder:
 
 
     def decode_question(self, response):
-        response.name = self.decode_name(12)
+        _, response.name = self.decode_name(12)
         self.packet_size += 4
         return 0
 
@@ -44,12 +44,18 @@ class Packet_Decoder:
         original_total = self.packet_size+1
         index = 0
         for i in range(response.num_answers):
-            name_pointer, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", answer_data[index: index + 12])
+            if answer_data[index] == 192:
+                _, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", answer_data[index: index + 12])
+                index += 12
+            else:
+                index, _ = self.decode_name(index)
+                index += 1
+                type, ans_class, ttl, rdlength = struct.unpack(">HHIH", answer_data[index: index + 10])
+                index += 10
             if ans_class != 1:
                 return 10
             response.type.append(type)
             response.ttl.append(ttl)
-            index = index + 12
             index, rdata = self.decode_record(rdlength, type, answer_data, index)
             response.answer.append(rdata)
         self.packet_size = index + original_total
@@ -76,7 +82,7 @@ class Packet_Decoder:
                     elif data[index] == 192:
                         pointer_found = True
                     elif pointer_found:
-                        rdata += self.decode_name(data[index])
+                        rdata += self.decode_name(data[index])[1]
                         pointer_found = False
                     else:
                         count = data[index]
@@ -86,7 +92,8 @@ class Packet_Decoder:
                     if count == 0:
                         rdata += "."
                 index += 1
-        if rdata[len(rdata) - 1] == ".":
+        
+        if len(rdata) != 0 and rdata[len(rdata) - 1] == ".":
             rdata = rdata[0:len(rdata) - 1]
         return [index, rdata]
 
@@ -94,16 +101,21 @@ class Packet_Decoder:
         additional_data = self.data[self.packet_size:]
         original_total = self.packet_size
         index = 0
-        for _ in range(response.num_additional):
+        for i in range(response.num_additional):
             if additional_data[index] == 192:
-                name_pointer, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", additional_data[index: index + 12])
+                _, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", additional_data[index: index + 12])
+                index += 12
+            else:
+                index, _ = self.decode_name(index)
+                index += 1
+                type, ans_class, ttl, rdlength = struct.unpack(">HHIH", additional_data[index: index + 10])
+                index += 10
             if ans_class != 1:
                 return 10
             if type != 1 and type != 2 and type != 5 and type != 15:
                 pass
             response.type.append(type)
             response.ttl.append(ttl)
-            index = index + 12
             index, rdata = self.decode_record(rdlength, type, additional_data, index)
             response.additional.append(rdata)
         self.packet_size = index + original_total
@@ -127,12 +139,12 @@ class Packet_Decoder:
                 more_vals = False
             elif num_vals == 192:
                 index += 1
-                name += "." + self.decode_name(name_data[index])
+                name += "." + self.decode_name(name_data[index])[1]
                 more_vals = False
             else:
                 name += "."
     
-        return name
+        return [index, name]
 
     def decode_packet(self):
         response = Response()

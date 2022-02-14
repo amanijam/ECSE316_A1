@@ -17,50 +17,58 @@ class Response:
         if self.num_answers != 0:
             print("\n***Answer Section (" +  str(self.num_answers) + " records)***\n")
         for answer in self.answer:
-            response = ""
-            if self.type[index] == 1:
-                response += "IP\t"
-            elif self.type[index] == 2:
-                response += "NS\t"
-            elif self.type[index] == 5:
-                response += "CNAME\t"
-            else:
-                response += "MX\t"
-            
-            response += answer + "\t"
-            response += str(self.ttl[index]) + "\t"
+            if self.type[index] == 1 or self.type[index] == 2 or self.type[index] == 5 or self.type[index] == 15:
+                response = ""
+                if self.type[index] == 1:
+                    response += "IP\t"
+                elif self.type[index] == 2:
+                    response += "NS\t"
+                elif self.type[index] == 5:
+                    response += "CNAME\t"
+                else:
+                    response += "MX\t"
+                
+                response += answer + "\t"
+                response += str(self.ttl[index]) + "\t"
 
-            if self.auth == '1':
-                response += "auth"
-            else:
-                response += "nonauth"
-            
+                if self.auth == '1':
+                    response += "auth"
+                else:
+                    response += "nonauth"
+                
+                print(response)
             index += 1
-            print(response)
+        
+        add_responses = []
+        for additional in self.additional:
+            if self.type[index] == 1 or self.type[index] == 2 or self.type[index] == 5 or self.type[index] == 15:
+                response = ""
+                if self.type[index] == 1:
+                    response += "IP\t"
+                elif self.type[index] == 2:
+                    response += "NS\t"
+                elif self.type[index] == 5:
+                    response += "CNAME\t"
+                else:
+                    response += "MX\t"
+                
+                response += additional + "\t"
+                response += str(self.ttl[index]) + "\t"
+
+                if self.auth == '1':
+                    response += "auth"
+                else:
+                    response += "nonauth"
+                
+                add_responses.append(response)
+            else:
+                self.num_additional -= 1
+            index += 1
         
         if self.num_additional != 0:
             print("\n***Additional Section (" +  str(self.num_additional) + " records)***\n")
-        for additional in self.additional:
-            response = ""
-            if self.type[index] == 1:
-                response += "IP\t"
-            elif self.type[index] == 2:
-                response += "NS\t"
-            elif self.type[index] == 5:
-                response += "CNAME\t"
-            else:
-                response += "MX\t"
-            
-            response += additional + "\t"
-            response += str(self.ttl[index]) + "\t"
-
-            if self.auth == '1':
-                response += "auth"
-            else:
-                response += "nonauth"
-            
-            index += 1
-            print(response)
+        for additional in add_responses:
+            print(additional)
         
         print("\n")
             
