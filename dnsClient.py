@@ -31,8 +31,8 @@ else:
             rType = 'MX'
             i += 1
             continue
-        elif(sys.argv[i] == '-nx'):
-            rType = 'NX'
+        elif(sys.argv[i] == '-ns'):
+            rType = 'NS'
             i += 1
             continue
         else:
