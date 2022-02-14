@@ -81,27 +81,27 @@ response_time = end_time - start_time
 print("\nResponse received after " + str(response_time) + " seconds (" + str(retries) + " retries)")
 ## TODO: Add descriptions to these errors ##
 if(return_val == 1):
-    print("\nERROR\t")
+    print("\nERROR\tFormat error: name server was unable to interpret the query")
 elif(return_val == 2): 
-    print("\nERROR\t")
+    print("\nERROR\tServer failure: name server was unable to process this query due to a problem with the name server")
 elif(return_val == 3):
-    print("\nERROR\t")
+    print("\nERROR\tName error: domain name specified in query does not exist")
 elif(return_val == 4): 
-    print("\nERROR\t")
+    print("\nERROR\tNot implemented: name server does not support the requested kind of query")
 elif(return_val == 5): 
-    print("\nERROR\t")
+    print("\nERROR\tRefused: the name server refuses to perform the requested operation for policy reasons")
 elif(return_val == 6): 
-    print("\nERROR\t")
+    print("\nERROR\tTimeout Error: the time exceeded the timeout value of " + str(query.timeout) + " seconds")
 elif(return_val == 7): 
-    print("\nNOTFOUND")
+    print("\nNOTFOUND\t no record found")
 elif (return_val == 8):
-    print("\nERROR\t")
+    print("\nERROR\tUnexpected response: response ID does not match Request ID")
 elif (return_val == 9):
-    print("\nERROR\t")
+    print("\nERROR\tUnexpected response: response packet indicates that it is a request (QR = 0) ")
 elif (return_val == 10):
-    print("\nERROR\t")
+    print("\nERROR\tUnexpected response: class in Answer section of the response packet is not set to 1")
 elif(return_val == 11): 
-    print("\nERROR\t")
+    print("\nERROR\tMax retries of " + query.maxR + " exceeded")
 else:
     response.display_response()
 # decoder = Packet_Decoder(data, query.header.id)

@@ -44,9 +44,12 @@ class Packet_Decoder:
         original_total = self.packet_size+1
         index = 0
         for i in range(response.num_answers):
+            if i != 0:
+                index = index
             name_pointer, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", answer_data[index: index + 12])
-            if ans_class != 1:
-                return 10
+            # if ans_class != 1:
+            #     print("hiiiiii")
+            #     return 10
             response.type.append(type)
             response.ttl.append(ttl)
             index = index + 12
@@ -56,46 +59,48 @@ class Packet_Decoder:
         return 0
     
     def decode_record(self, rdlength, type, data, index):
+        print(data)
         rdata = ""
         if type == 1:
             for i in range(rdlength):
                 rdata += str(struct.unpack(">B", data[index:index+1])[0])
-                if i != rdlength-1:
-                    rdata += "."
+                rdata += "."
                 index += 1
         
         else:
             if type == 15:
                 index += 2
-            count = 1
-            while True:
-                num_vals = data[index]
-                if num_vals == 192:
-                    index += 1
-                    rdata += self.decode_name(data[index])
-                    count += 2
+            count = 0
+            pointer_found = False
+            for _ in range(rdlength):
+                if count == 0:
+                    if index >= len(data):
+                        break
+                    elif data[index] == 192:
+                        pointer_found = True
+                    elif pointer_found:
+                        rdata += self.decode_name(data[index])
+                    else:
+                        count = data[index]
                 else:
-                    for _ in range(num_vals):
-                        index += 1
-                        rdata += chr(data[index])
-                        count += 1
-                
+                    rdata += chr(data[index])
+                    count -= 1
+                    if count == 0:
+                        rdata += "."
                 index += 1
-                if count >= rdlength or data[index] == 0:
-                    break
-                else:
-                    rdata += "."
-        
+                print(rdata)
+        if rdata[len(rdata) - 1] == ".":
+            rdata = rdata[0:len(rdata) - 1]
         return [index, rdata]
 
     def decode_additional(self, response):
         additional_data = self.data[self.packet_size:]
         original_total = self.packet_size
         index = 0
-        for i in range(response.num_additional):
-            name_pointer, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", additional_data[index: index + 12])
-            if ans_class != 1:
-                return 10
+        for _ in range(response.num_additional):
+            _, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", additional_data[index: index + 12])
+            # if ans_class != 1:
+            #     return 10
             if type != 1 and type != 2 and type != 5 and type != 15:
                 pass
             response.type.append(type)
@@ -124,7 +129,7 @@ class Packet_Decoder:
                 more_vals = False
             else:
                 name += "."
-        
+    
         return name
 
     def decode_packet(self):

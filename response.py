@@ -14,8 +14,9 @@ class Response:
     
     def display_response(self):
         index = 0
-        print("\n***Answer Section (" +  str(self.num_answers) + " records)***\n")
-        for i in range(self.num_answers):
+        if self.num_answers != 0:
+            print("\n***Answer Section (" +  str(self.num_answers) + " records)***\n")
+        for answer in self.answer:
             response = ""
             if self.type[index] == 1:
                 response += "IP\t"
@@ -26,7 +27,7 @@ class Response:
             else:
                 response += "MX\t"
             
-            response += self.answer[i] + "\t"
+            response += answer + "\t"
             response += str(self.ttl[index]) + "\t"
 
             if self.auth == '1':
@@ -37,8 +38,9 @@ class Response:
             index += 1
             print(response)
         
-        print("\n***Additional Section (" +  str(self.num_additional) + " records)***\n")
-        for i in range(self.num_additional):
+        if self.num_additional != 0:
+            print("\n***Additional Section (" +  str(self.num_additional) + " records)***\n")
+        for additional in self.additional:
             response = ""
             if self.type[index] == 1:
                 response += "IP\t"
@@ -49,7 +51,7 @@ class Response:
             else:
                 response += "MX\t"
             
-            response += self.additional[i] + "\t"
+            response += additional + "\t"
             response += str(self.ttl[index]) + "\t"
 
             if self.auth == '1':
