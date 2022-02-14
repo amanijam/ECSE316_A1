@@ -37,122 +37,108 @@ class Packet_Decoder:
 
 
     def decode_question(self, response):
-        question_data = self.data[12:]
-        num_vals = question_data[0]
-        address = ""
+        response.name = self.decode_name(12)
+        self.packet_size += 4
+        return 0
+
+    def decode_answer(self, response):
+        answer_data = self.data[self.packet_size+1:]
+        original_total = self.packet_size+1
+        index = 0
+        for i in range(response.num_answers):
+            name_pointer, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", answer_data[index: index + 12])
+            if ans_class != 1:
+                return 10
+            response.type = type
+            response.ttl = ttl
+            index = index + 12
+            rdata = ""
+            if type == 1:
+                for i in range(rdlength):
+                    rdata += str(struct.unpack(">B", answer_data[index:index+1])[0])
+                    if i != rdlength-1:
+                        rdata += "."
+                    index += 1
+            
+            else:
+                if type == 15:
+                    index += 2
+                count = 1
+                while True:
+                    num_vals = answer_data[index]
+                    if num_vals == 192:
+                        index += 1
+                        rdata += self.decode_name(answer_data[index])
+                        count += 2
+                    else:
+                        for _ in range(num_vals):
+                            index += 1
+                            rdata += chr(answer_data[index])
+                            count += 1
+                    
+                    index += 1
+                    if count >= rdlength or answer_data[index] == 0:
+                        break
+                    else:
+                        rdata += "."
+
+            response.answer.append(rdata)
+            rdata = ""
+        self.packet_size = index + original_total
+        return 0
+
+    def decode_additional(self, response):
+        additional_data = self.data[self.packet_size:]
+        original_total = self.packet_size
+        index = 0
+        for _ in range(response.num_additional):
+            rdata = ""
+            while True:
+                num_vals = additional_data[index]
+                if num_vals == 192:
+                    index += 1
+                    rdata += self.decode_name(additional_data[index])
+                else:
+                    for _ in range(num_vals):
+                        index += 1
+                        rdata += chr(additional_data[index])
+                index += 1
+                if index + original_total >= len(self.data) or additional_data[index] == 0:
+                    break
+                # else:
+                #     rdata += "."
+
+    def decode_name(self, offset):
+        name_data = self.data[offset:]
+        num_vals = name_data[0]
+        name = ""
         index = 0
         more_vals = True
         while more_vals:
             for _ in range(num_vals):
                 index += 1
                 self.packet_size += 1
-                address += chr(question_data[index])
+                name += chr(name_data[index])
             index += 1
             self.packet_size += 1
-            num_vals = question_data[index]
+            num_vals = name_data[index]
             if num_vals == 0:
                 more_vals = False
             else:
-                address += "."
-
-        response.name = address
-        self.packet_size += 4
-        return 0
-
-    def decode_answer(self, response):
-        answer_data = self.data[self.packet_size+1:]
-        print(self.data[self.packet_size+1:])
-        type, ans_class, ttl, rdlength = struct.unpack(">HHIH", answer_data[2:12])
-        if ans_class != 1:
-            return 10
-        response.type = type
-        response.ttl = ttl
-        index = 12
-        if type == 1:
-            rdata = ""
-            for i in range(rdlength):
-                rdata += str(struct.unpack(">B", answer_data[index:index+1])[0])
-                if i != rdlength-1:
-                    rdata += "."
-                index += 1
-            
-            print(rdata)
-        elif type == 2 or type == 5:
-            rdata = ""
-            for i in range(response.num_answers):
-                rdata = ""
-                num_vals = answer_data[index] 
-                if num_vals == 192:
-                    index += 1
-                    index += answer_data[index] + 1
-                    num_vals = answer_data[index]
-                for _ in range(num_vals):
-                    index += 1
-                    rdata += chr(answer_data[index])
-                    print(rdata)
-
-                if i != (response.num_answers - 1):
-                    index += 1
-                
-                response.answer.append(rdata)
+                name += "."
         
-        else:
-            rdata = ""
-            for i in range(response.num_answers):
-                rdata = ""
-                num_vals = answer_data[index] 
-                if num_vals == 192:
-                    index += 1
-                    index += answer_data[index] + 1
-                    num_vals = answer_data[index]
-                while True:
-                    for _ in range(num_vals):
-                        index += 1
-                        rdata += chr(answer_data[index])
-                        print(rdata)
-                    index += 1
-                    num_vals = answer_data[index]
-                    if num_vals == 0:
-                        break
-                    rdata += "."
-
-                    # if i != (response.num_answers - 1):
-                    #     index += 1
-                    
-                    # response.answer.append(rdata)
-
-                
-
-            # if type == 15:
-            #     index += 2
-            # response_data = answer_data[index:]
-            # print(response_data)
-            # num_vals = response_data[0]
-            # rdata = ""
-            # index = 0
-            # more_vals = True
-            # while more_vals:
-            #     for _ in range(num_vals):
-            #         index += 1
-            #         self.packet_size += 1
-            #         rdata += chr(response_data[index])
-            #     index += 1
-            #     self.packet_size += 1
-            #     num_vals = response_data[index]
-            #     if num_vals == 0:
-            #         more_vals = False
-            #     else:
-            #         rdata += "."
-        
-        return 0
+        return name
 
     def decode_packet(self):
         response = Response()
-        self.decode_header(response)
-        self.decode_question(response)
-        self.decode_answer(response)
-        # decode_additional()
-        return True
+        return_val = self.decode_header(response)
+        if return_val == 0:
+            return_val = self.decode_question(response)
+            if return_val == 0 and response.num_answers != 0:
+                self.decode_answer(response)
+                if return_val == 0 and response.num_additional != 0:
+                    self.decode_additional(response)
+        return return_val
 
     # def decode_question(data):
 

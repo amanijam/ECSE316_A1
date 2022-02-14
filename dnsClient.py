@@ -59,7 +59,7 @@ else:
 server = sys.argv[-2]
 name = sys.argv[-1]
 
-print("DNS Client sending request for {}".format(name))
+print("\nDNS Client sending request for {}".format(name))
 print("Server: {}".format(server))
 print("Request type: {}".format(rType))
 
@@ -79,7 +79,6 @@ while(retries < maxR):
         response = query.send()
         retries += 1
     else:
-        print(response)
         break #SUCCESS
 
 if retries == maxR:
