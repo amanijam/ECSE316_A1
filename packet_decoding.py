@@ -45,9 +45,8 @@ class Packet_Decoder:
         index = 0
         for i in range(response.num_answers):
             name_pointer, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", answer_data[index: index + 12])
-            # if ans_class != 1:
-            #     print("hiiiiii")
-            #     return 10
+            if ans_class != 1:
+                return 10
             response.type.append(type)
             response.ttl.append(ttl)
             index = index + 12
@@ -96,9 +95,10 @@ class Packet_Decoder:
         original_total = self.packet_size
         index = 0
         for _ in range(response.num_additional):
-            _, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", additional_data[index: index + 12])
-            # if ans_class != 1:
-            #     return 10
+            if additional_data[index] == 192:
+                name_pointer, type, ans_class, ttl, rdlength = struct.unpack(">HHHIH", additional_data[index: index + 12])
+            if ans_class != 1:
+                return 10
             if type != 1 and type != 2 and type != 5 and type != 15:
                 pass
             response.type.append(type)

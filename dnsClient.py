@@ -56,7 +56,7 @@ else:
             break
 # if(sys.argv[-2])[0] == '@': server = sys.argv[-2][1:]
 # else: sys.exit("ERROR Expected Syntax: {}".format(expSyntax))
-server = sys.argv[-2]
+server = sys.argv[-2][1:]
 name = sys.argv[-1]
 
 print("\nDNS Client sending request for {}".format(name))
