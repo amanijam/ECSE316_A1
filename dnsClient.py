@@ -5,10 +5,13 @@ from queries import *
 timeout, maxR, port, rType = 5, 3, 53, 'A'
 server, name = None, None
 
-expSyntax = "dnsClient [-t timeout] [-r max-retries] [-p port] [-mx|ns] @server name"
+expSyntax = "dnsClient.py [-t timeout] [-r max-retries] [-p port] [-mx|ns] server name"
 
-# Parse input with expected format: python dnsClient [-t timeout] [-r max-retries] [-p port] [-mx|ns] @server name
-if len(sys.argv) < 3: print("Not enough args")
+# Parse input with expected format: python dnsClient.py [-t timeout] [-r max-retries] [-p port] [-mx|ns] @server name
+if len(sys.argv) < 3: 
+    print("ERROR\tNot enough args\n\tExpected Syntax: {}".format(expSyntax))
+elif len(sys.argv) > 6: 
+    print("ERROR\tToo many args\n\tExpected Syntax: {}".format(expSyntax))
 else:
     i = 1
     while(i < len(sys.argv)-2):
@@ -33,14 +36,12 @@ else:
             i += 1
             continue
         else:
-            print("ERROR Expected Syntax: {}".format(expSyntax))
-            break
-    # if(sys.argv[-2])[0] == '@': server = sys.argv[-2][1:]
-    # else: sys.exit("ERROR Expected Syntax: {}".format(expSyntax))
+            print("ERROR\t\"{}\" is not recognized as an arg\n\tExpected Syntax: {}".format(sys.argv[i], expSyntax))
+            exit(1)
+    
     server = sys.argv[-2]
     name = sys.argv[-1]
-    # print('{} {} {} {} {} {} {}'.format(timeout, maxR, port, rType, server, name))
-
+    
     print("DNS Client sending request for {}".format(name))
     print("Server: {}".format(server))
     print("Request type: {}".format(rType))
