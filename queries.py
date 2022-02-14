@@ -34,6 +34,6 @@ class Query:
             return 6
         
         decoder = Packet_Decoder(data, self.header.id)
-        decoder.decode_packet()
-        return data
+        code_val, response = decoder.decode_packet()
+        return [code_val, response]
     

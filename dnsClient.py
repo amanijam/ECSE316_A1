@@ -64,45 +64,46 @@ print("Server: {}".format(server))
 print("Request type: {}".format(rType))
 
 query = Query(server, name, timeout, maxR, port, rType)
-startTime = timeit.timeit()
-response = query.send()
+start_time = timeit.timeit()
+return_val, response = query.send()
 retries = 0
 while(retries < maxR):
-    if(response == 1 or
-       response == 2 or
-       response == 3 or
-       response == 4 or
-       response == 5 or
-       response == 7): 
-        break
-    elif(response == 6): # resend
-        response = query.send()
+    if(return_val == 6): # resend
+        return_val = query.send()
         retries += 1
     else:
         break #SUCCESS
 
 if retries == maxR:
-    response = 11
-endTime = timeit.timeit()
-responseTime = endTime - startTime
-print("\nResponse received after " + str(responseTime) + " seconds (" + str(retries) + " retries)")
+    return_val = 11
+end_time = timeit.timeit()
+response_time = end_time - start_time
+print("\nResponse received after " + str(response_time) + " seconds (" + str(retries) + " retries)")
 ## TODO: Add descriptions to these errors ##
-if(response == 1):
+if(return_val == 1):
     print("\nERROR\t")
-elif(response == 2): 
+elif(return_val == 2): 
     print("\nERROR\t")
-elif(response == 3):
+elif(return_val == 3):
     print("\nERROR\t")
-elif(response == 4): 
+elif(return_val == 4): 
     print("\nERROR\t")
-elif(response == 5): 
+elif(return_val == 5): 
     print("\nERROR\t")
-elif(response == 6): 
+elif(return_val == 6): 
     print("\nERROR\t")
-elif(response == 7): 
+elif(return_val == 7): 
     print("\nNOTFOUND")
-elif(response == 11): 
+elif (return_val == 8):
     print("\nERROR\t")
+elif (return_val == 9):
+    print("\nERROR\t")
+elif (return_val == 10):
+    print("\nERROR\t")
+elif(return_val == 11): 
+    print("\nERROR\t")
+else:
+    response.display_response()
 # decoder = Packet_Decoder(data, query.header.id)
 # decoder.decode_packet()
 
