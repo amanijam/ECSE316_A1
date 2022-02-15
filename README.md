@@ -1,7 +1,9 @@
 # ECSE316
 # Assignment 1: Network Programming and DNS
 
-## Names and McGill IDs
+## Group number, Names and McGill IDs
+* Group 14
+
 * Amani Jammoul 260381641
 
 * Ramin Akhavan-Sarraf 260904764
