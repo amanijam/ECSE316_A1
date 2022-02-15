@@ -156,15 +156,3 @@ class Packet_Decoder:
                 if return_val == 0 and response.num_additional != 0:
                     self.decode_additional(response)
         return [return_val, response]
-
-    # def decode_question(data):
-
-    # def decode_answer(data):
-
-    # def decode_additional(data):
-
-
-
-# if __name__ == "__main__":
-#     data = b'\xbc\xf7\x81\x01\x00\x00\x00\x00\x00\x00\x00\x00'
-#     decode_packet(data)

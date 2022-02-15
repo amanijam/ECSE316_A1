@@ -30,8 +30,8 @@ class Query:
         #print("Request pack: {}".format(requestPack.pack))
         try:
             data = client.recv(1024)
-        except socket.timeout:
-            return 6
+        except:
+            return [6, None]
         
         decoder = Packet_Decoder(data, self.header.id)
         code_val, response = decoder.decode_packet()

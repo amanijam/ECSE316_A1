@@ -6,7 +6,7 @@ from queries import *
 from packet_decoding import *
 
 # Error codes:
-# 0 : success
+# 0 : Success
 # 1 : Format error: name server was unable to interpret the query
 # 2 : Server failure: name server was unable to process this query due to a problem with the name server
 # 3 : Name error: meaningful only for responses from an authoritative name server, this code
@@ -32,15 +32,15 @@ else:
     i = 1
     while(i < len(sys.argv)-2):
         if(sys.argv[i] == '-t'):
-            timeout = sys.argv[i + 1]
+            timeout = float(sys.argv[i + 1])
             i += 2
             continue
         elif(sys.argv[i] == '-r'):
-            maxR = sys.argv[i + 1]
+            maxR = int(sys.argv[i + 1])
             i += 2
             continue
         elif(sys.argv[i] == '-p'):
-            port = sys.argv[i + 1]
+            port = int(sys.argv[i + 1])
             i += 2
             continue
         elif(sys.argv[i] == '-mx'): 
@@ -54,8 +54,6 @@ else:
         else:
             print("ERROR Expected Syntax: {}".format(expSyntax))
             break
-# if(sys.argv[-2])[0] == '@': server = sys.argv[-2][1:]
-# else: sys.exit("ERROR Expected Syntax: {}".format(expSyntax))
 server = sys.argv[-2]
 name = sys.argv[-1]
 
@@ -69,16 +67,15 @@ return_val, response = query.send()
 retries = 0
 while(retries < maxR):
     if(return_val == 6): # resend
-        return_val = query.send()
+        return_val, response = query.send()
         retries += 1
     else:
-        break #SUCCESS
+        break
 
 if retries == maxR:
     return_val = 11
 end_time = timeit.timeit()
 response_time = end_time - start_time
-print("\nResponse received after " + str(response_time) + " seconds (" + str(retries) + " retries)")
 ## TODO: Add descriptions to these errors ##
 if(return_val == 1):
     print("\nERROR\tFormat error: name server was unable to interpret the query")
@@ -101,11 +98,10 @@ elif (return_val == 9):
 elif (return_val == 10):
     print("\nERROR\tUnexpected response: class in Answer section of the response packet is not set to 1")
 elif(return_val == 11): 
-    print("\nERROR\tMax retries of " + query.maxR + " exceeded")
+    print("\nERROR\tMax retries of " + str(query.maxR) + " exceeded")
 else:
+    print("\nResponse received after " + str(response_time) + " seconds (" + str(retries) + " retries)")
     response.display_response()
-# decoder = Packet_Decoder(data, query.header.id)
-# decoder.decode_packet()
 
 
 
