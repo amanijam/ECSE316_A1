@@ -30,7 +30,7 @@ expSyntax = "dnsClient.py [-t timeout] [-r max-retries] [-p port] [-mx|ns] serve
 if len(sys.argv) < 3: 
     print("ERROR\tNot enough args\n\tExpected Syntax: {}".format(expSyntax))
     exit(1)
-elif len(sys.argv) > 6: 
+elif len(sys.argv) > 10: 
     print("ERROR\tToo many args\n\tExpected Syntax: {}".format(expSyntax))
     exit(1)
 else:
