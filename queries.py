@@ -3,6 +3,8 @@
 import socket
 from packet import *
 
+from packet_decoding import Packet_Decoder
+
 class Query:
     def __init__(self, server, name, timeout=5, maxR=3, port=53, ty='A'):
         self.timeout = timeout
@@ -14,16 +16,24 @@ class Query:
         
     def send(self):
         #create Header for request
-        header = Header() 
+        self.header = Header() 
 
         # create Question
         question = Question(self.name, self.ty, 1)
 
-        requestPack = Packet(header, question)
+        requestPack = Packet(self.header, question)
         addr = (self.server, self.port)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.connect(addr)
+        client.settimeout(self.timeout)
         client.send(requestPack.pack)
-        data = client.recv(1024) ## NOTE: probably will have to loop or something to get full data
-        return data
+        #print("Request pack: {}".format(requestPack.pack))
+        try:
+            data = client.recv(1024)
+        except:
+            return [6, None]
+        
+        decoder = Packet_Decoder(data, self.header.id)
+        code_val, response = decoder.decode_packet()
+        return [code_val, response]
     

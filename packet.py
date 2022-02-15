@@ -72,18 +72,21 @@ class Question:
     def getSection(self):
         return b''.join([self.qName, self.qType, self.qClass])
 
+
 def encodeName(name: str):
     lengths = getLengthsList(name)
-    code = ''
-    x = 0
+    code = b'' #actual encoding (bytes)
+    x = 0 #iterate through 'name'
     for i in range(0, len(lengths)):
-        code += str(lengths[i])
+        code += lengths[i].to_bytes(1, 'big')
+        codeStr = ''
         for j in range (0, lengths[i]):
-            code += name[x]
+            codeStr += name[x]
             x += 1
         x += 1 # skip '.'
-    code += '0' # 0 marks end of QNAME 
-    return code.encode()
+        code += codeStr.encode()
+    code += b'\x00' # 0 marks end of QNAME 
+    return code
 
 def getLengthsList(name: str):
     lengths = []
