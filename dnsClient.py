@@ -39,7 +39,6 @@ else:
             print("ERROR\t\"{}\" is not recognized as an arg\n\tExpected Syntax: {}".format(sys.argv[i], expSyntax))
             exit(1)
     
-
     if(sys.argv[-2][0] == '@'): 
         print("ERROR\tServer address should not be prefixed with \"@\"\n\tExpected Syntax: {}".format(expSyntax))
         exit(1)
