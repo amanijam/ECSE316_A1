@@ -13,9 +13,10 @@ class Response:
         self.num_additional = 0
     
     def display_response(self):
-        index = 0
+        index = 0 # keep track of index in ttl and type
         if self.num_answers != 0:
             print("\n***Answer Section (" +  str(self.num_answers) + " records)***\n")
+        # Goes through all answers, formats them appropriately and prints the lines
         for answer in self.answer:
             if self.type[index] == 1 or self.type[index] == 2 or self.type[index] == 5 or self.type[index] == 15:
                 response = ""
@@ -40,6 +41,8 @@ class Response:
             index += 1
         
         add_responses = []
+        # Goes through all additional records and formats them appropriately
+        # Filters out the non-compatible records
         for additional in self.additional:
             if self.type[index] == 1 or self.type[index] == 2 or self.type[index] == 5 or self.type[index] == 15:
                 response = ""
@@ -67,6 +70,8 @@ class Response:
         
         if self.num_additional != 0:
             print("\n***Additional Section (" +  str(self.num_additional) + " records)***\n")
+        
+        # prints all the appropriate additional records
         for additional in add_responses:
             print(additional)
         
