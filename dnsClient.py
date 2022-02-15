@@ -70,21 +70,22 @@ print("Server: {}".format(server))
 print("Request type: {}".format(rType))
 
 query = Query(server, name, timeout, maxR, port, rType)
-start_time = timeit.timeit()
-return_val, response = query.send()
+start_time = timeit.timeit() # start timing for length of response time
+return_val, response = query.send() 
 retries = 0
 while(retries < maxR):
-    if(return_val == 6): # resend
-        return_val, response = query.send()
+    if(return_val == 6): # timeout error
+        return_val, response = query.send() # retry
         retries += 1
-    else:
+    else: # if the number of retries exceeds max retry value, stop resending
         break
 
 if retries == maxR:
     return_val = 11
-end_time = timeit.timeit()
-response_time = end_time - start_time
-## TODO: Add descriptions to these errors ##
+end_time = timeit.timeit() # stop timer
+response_time = end_time - start_time # calculate response time (in s)
+
+# Error Messages
 if(return_val == 1):
     print("\nERROR\tFormat error: name server was unable to interpret the query")
 elif(return_val == 2): 
@@ -107,7 +108,7 @@ elif (return_val == 10):
     print("\nERROR\tUnexpected response: class in Answer section of the response packet is not set to 1")
 elif(return_val == 11): 
     print("\nERROR\tMax retries of " + str(query.maxR) + " exceeded")
-else:
+else: # success
     print("\nResponse received after " + str(response_time) + " seconds (" + str(retries) + " retries)")
     response.display_response()
 
