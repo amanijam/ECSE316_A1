@@ -29,3 +29,11 @@ Our program expects that the server IPv4 address (2nd to last input) is given as
 * packet.py
 
 * packet_decoding.py
+
+## Assignemnt Description
+![A1 - 1 of 4](https://github.com/amanijam/ECSE316_A1/assets/19826681/93cd3af6-96a0-41cb-9931-b5ecae8f58f4)
+![A1 - 2 of 4](https://github.com/amanijam/ECSE316_A1/assets/19826681/45aff3d3-97c9-409c-bbd5-e56fbca0f914)
+![A1 - 3 of 4](https://github.com/amanijam/ECSE316_A1/assets/19826681/d4bb6768-c252-4b81-9a3c-9a2211a49011)
+![A1 - 4 of 4](https://github.com/amanijam/ECSE316_A1/assets/19826681/2f98caa2-fb31-4602-928d-e7076d6eddfa)
+
+
